@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chinese Clock</title>
+    <style>
+      body {
+        margin: 0;
+      }
+      main {
+        margin: 1em;
+        display: flex;
+      }
+      main > * {
+        flex-grow: 1;
+      }
+      .circle {
+        width: 50vw;
+        height: 50vh;
+        max-width: 50vh;
+        max-height: 50vw;
+        border-radius: 100%;
+        border: 1px solid black;
+        position: relative;
+      }
+      .circle > span {
+        position: absolute;
+        transform: translate(-50%, -50%);
+        padding: 0.1em;
+      }
+      #pin {
+        position: absolute;
+        left: 50%;
+        transform-origin: bottom;
+      }
+      .circle > span.active {
+        background-color: black;
+        color: white;
+      }
+      #pin {
+        width: 1px;
+        height: 50%;
+        position: relative;
+      }
+      #pin-inner {
+        width: 1px;
+        height: calc(100% - 2em);
+        top: 2em;
+        position: absolute;
+        background-color: black;
+      }
+      footer {
+        border-top: 1px solid grey;
+        width: 100%;
+        padding: 0.5em;
+        position: fixed;
+        bottom: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div id="list"></div>
+      <div id="clock">
+        <div class="circle">
+          <div id="pin">
+            <div id="pin-inner"></div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <footer>
+      <a href="https://github.com/beenotung/chinese-clock">About</a>
+    </footer>
+    <script>
+      let { cos, sin, PI, round, min, abs } = Math
+
+      let list = document.querySelector('#list')
+      let clock = document.querySelector('#clock')
+      let circle = document.querySelector('.circle')
+      let pin = document.querySelector('#pin')
+
+      let source = `子時：23點到1點；丑時：1點到3點；寅時：3點到5點；卯時：5點到7點；辰時：7點到9點；巳時：9點到11點；午時：11點到13點；未時：13點到15點；申時：15點到17點；酉時：17點到19點；戌時：19點到21點；亥時：21點到23點`
+
+      let slotList = []
+
+      let listHTML = '<dl>'
+      source.split('；').forEach(s => {
+        let [name, range] = s.split('：')
+        let [from, to] = range.split('到')
+        name = name.replace('時', '')
+        from = +from.replace('點', '')
+        to = +to.replace('點', '')
+        console.log({ name, from, to })
+        slotList.push({
+          name,
+          from,
+          to,
+        })
+        listHTML += `<dt>${name}</dt> <dd>${from} - ${to}</dd>`
+        let span = document.createElement('span')
+        span.textContent = name
+        circle.appendChild(span)
+      })
+      listHTML += '</dl>'
+
+      list.innerHTML = listHTML
+
+      let spanList = circle.querySelectorAll('span')
+
+      function render() {
+        let rect = circle.getBoundingClientRect()
+        let { width, height } = rect
+        spanList.forEach((span, i) => {
+          slotList[i].span = span
+          slotList[i].i = i
+          let name = span.textContent
+          let size = span.getBoundingClientRect().width
+          let r = width / 2 - size
+          let degree = i * (360 / 12) - 90
+          if (degree < 0) degree += 360
+          let radian = (degree * PI) / 180
+          console.log({ name, degree })
+          let x = cos(radian)
+          let y = sin(radian)
+          span.style.top = y * r + height / 2 + 'px'
+          span.style.left = x * r + width / 2 + 'px'
+        })
+      }
+      window.addEventListener('resize', render)
+      requestAnimationFrame(render)
+
+      function tick() {
+        let date = new Date()
+        let hour = date.getHours() + date.getMinutes() / 60
+        let degree = (hour / 24) * 360
+        pin.style.transform = `rotate(${degree}deg)`
+        slotList
+          .map(slot => {
+            return {
+              slot,
+              diff: min(abs(slot.from - hour), abs(slot.to - hour)),
+            }
+          })
+          .sort((a, b) => a.diff - b.diff)
+          .forEach(({ slot }, i) => {
+            let { span } = slot
+            if (i == 0) {
+              span.classList.add('active')
+            } else {
+              span.classList.remove('active')
+            }
+          })
+        let idx = round(hour / 2)
+        spanList.item(idx)
+        spanList.forEach((span, i) => {})
+        setTimeout(() => requestAnimationFrame(tick), 1000 * 60)
+      }
+      requestAnimationFrame(tick)
+    </script>
+  </body>
+</html>
