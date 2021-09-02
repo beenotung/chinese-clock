@@ -21,6 +21,10 @@ Hosted on https://chinese-clock.surge.sh
 | 戌   | 19 - 21 |
 | 亥   | 21 - 23 |
 
+## TODO
+- [ ] dark mode
+- [ ] PWA setup
+
 ## License
 
 This project is licensed with [BSD-2-Clause](./LICENSE)
