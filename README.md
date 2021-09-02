@@ -2,7 +2,7 @@
 
 Hosted on https://chinese-clock.surge.sh
 
-![clock preview](./clock.png)
+![clock preview](./imgs/clock.png)
 
 **Timeslot Naming:**
 
@@ -23,7 +23,7 @@ Hosted on https://chinese-clock.surge.sh
 
 ## TODO
 - [ ] dark mode
-- [ ] PWA setup
+- [x] PWA setup
 
 ## License
 
