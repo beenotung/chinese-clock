@@ -31,6 +31,15 @@
       main > * {
         flex-grow: 1;
       }
+      #clock {
+        text-align: center;
+      }
+      #clock-time {
+        width: 50vw;
+        max-width: 50vh;
+        display: block;
+        padding-top: 1em;
+      }
       .circle {
         width: 50vw;
         height: 50vh;
@@ -84,6 +93,7 @@
             <div id="pin-inner"></div>
           </div>
         </div>
+        <time id="clock-time"></time>
       </div>
     </main>
     <footer>
@@ -96,6 +106,7 @@
       let clock = document.querySelector('#clock')
       let circle = document.querySelector('.circle')
       let pin = document.querySelector('#pin')
+      let clockTime = document.querySelector('#clock-time')
 
       let source = `子時：23點到1點；丑時：1點到3點；寅時：3點到5點；卯時：5點到7點；辰時：7點到9點；巳時：9點到11點；午時：11點到13點；未時：13點到15點；申時：15點到17點；酉時：17點到19點；戌時：19點到21點；亥時：21點到23點`
 
@@ -129,8 +140,9 @@
         let rect = circle.getBoundingClientRect()
         let { width, height } = rect
         spanList.forEach((span, i) => {
-          slotList[i].span = span
-          slotList[i].i = i
+          let slot = slotList[i]
+          slot.span = span
+          slot.i = i
           let name = span.textContent
           let size = span.getBoundingClientRect().width
           let r = width / 2 - size
@@ -142,6 +154,7 @@
           let y = sin(radian)
           span.style.top = y * r + height / 2 + 'px'
           span.style.left = x * r + width / 2 + 'px'
+          slot.degree = degree
         })
       }
       window.addEventListener('resize', render)
@@ -149,6 +162,11 @@
 
       function tick() {
         let date = new Date()
+        let timeText = date
+          .toLocaleTimeString('en-US', { hour12: false })
+          .slice(0, 5)
+        clockTime.datetime = timeText
+        clockTime.textContent = timeText
         let hour = date.getHours() + date.getMinutes() / 60
         let degree = (hour / 24) * 360
         pin.style.transform = `rotate(${degree}deg)`
@@ -156,7 +174,10 @@
           .map(slot => {
             return {
               slot,
-              diff: min(abs(slot.from - hour), abs(slot.to - hour)),
+              diff: min(
+                abs(degree - ((slot.degree + 90) % 360)),
+                abs(degree - (((slot.degree + 90) % 360) + 360)),
+              ),
             }
           })
           .sort((a, b) => a.diff - b.diff)
