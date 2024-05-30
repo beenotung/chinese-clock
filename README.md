@@ -1,5 +1,7 @@
 # chinese-clock
 
+24 小時制子午時鐘
+
 Hosted on https://chinese-clock.surge.sh
 
 ![clock preview](./imgs/clock.png)
@@ -22,6 +24,7 @@ Hosted on https://chinese-clock.surge.sh
 | 亥   | 21 - 23 |
 
 ## TODO
+
 - [ ] dark mode
 - [x] PWA setup
 
